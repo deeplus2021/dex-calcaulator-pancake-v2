@@ -3,12 +3,12 @@ import dotenv from 'dotenv'
 
 let artifact = require('./artifacts/PancakeCal.json');
 dotenv.config();
-const web3 = new Web3(process.env.BSC_TEST_RPC_URL);
+const web3 = new Web3(process.env.BSC_MAINNET_RPC_URL);
 const address = process.env.PAN_CONTRACT_ADDRESS;
 const DENOMINATOR = Number(process.env.DENOMINATOR);
 const contract = new web3.eth.Contract(artifact.abi, address);
 
-export async function swapableTokenAmountInThePool(token0: string, token1: string, startPrice: number, endPrice: number) {
+export async function swapableTokenAmountInThePool(pool: string, startPrice: number, endPrice: number, rangeType: number) {
     try {
         const returns: {
             'current': number,
@@ -17,7 +17,7 @@ export async function swapableTokenAmountInThePool(token0: string, token1: strin
             'decimals0': number,
             'symbol0': string,
             'symbol1': string
-        } = await contract.methods.getSwapableTokenAmount(token0, token1, startPrice * DENOMINATOR, endPrice * DENOMINATOR).call();
+        } = await contract.methods.getSwapableTokenAmount(pool, startPrice * DENOMINATOR, endPrice * DENOMINATOR, rangeType).call();
 
         let amountForStart = (Number(returns.startReserve) - Number(returns.current)) / (10 ** Number(returns.decimals0));
         let endForStart = (Number(returns.endReserve) - Number(returns.current)) / (10 ** Number(returns.decimals0));
@@ -42,14 +42,14 @@ export async function swapableTokenAmountInThePool(token0: string, token1: strin
     };
 }
 
-export async function tokenPriceInThePool(token0: string, token1: string) {
+export async function tokenPriceInThePool(pool: string) {
     try {
         const returns: {
             'price01': number,
             'price10': number,
             'symbol0': string,
             'symbol1': string
-        } = await contract.methods.getPriceFromPoolTokens(token0, token1).call();
+        } = await contract.methods.getPriceFromPoolTokens(pool).call();
         const price01: number = Number(returns.price01) / DENOMINATOR;
         const price10: number = Number(returns.price10) / DENOMINATOR;
         // output prices
