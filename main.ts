@@ -1,4 +1,7 @@
-import { tokenPriceInThePool, swapableTokenAmountInThePool } from "./endpoint";
+import {
+    tokenPriceInThePool,
+    swapableTokenAmountInThePool
+} from "./endpoint";
 import dotenv from 'dotenv';
 
 dotenv.config();

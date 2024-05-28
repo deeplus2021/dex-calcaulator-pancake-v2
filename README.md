@@ -4,10 +4,6 @@
 
 This typescript interface is developed to interact with smart contracts on the BSC chain for calculating pool prices of pancakeswap V2.
 
-## Smart Contract Address
-
-0x50e65732f6fe18a6cbe7ad962bf6a2c445821545
-
 ## How to use
 
 ### To get the price of the pool
@@ -42,7 +38,7 @@ The type of commands to use this feature is as follow:
 ```
 ts-node main.ts 2 <pair_address> <range_from> <range_to> <0|1>
 ```
-The last parameter is for range type.
+The last parameter is for `range type`.
 
 If you are going to put range of prices as `token0/token1` (In above example, `WBNB/FINK`), you should put this parameter as `0`.
 
@@ -56,7 +52,9 @@ ts-node main.ts 2 0x72dd39014b8c9230498307e9da40872f1644aeef 84160 84161 0
 0.0004386 WBNB is able to get by swapping FINK in the top price of 84161 WBNB/FINK
 ```
 
-The result shows that swapable WBNB's amount based on the given price ranges of `WBNB/FINK`.
+Above result shows that swapable `WBNB`'s amount based on the given price ranges of `WBNB/FINK`.
+
+In other words, if you swap `0.0003672 WBNB`, then you will get some `FINK` and the price will be `84160 WBNB/FINK`. And you can get `0.0004386 WBNB` by swapping some `FINK` and the price will be `84161 WBNB/FINK`.
 
 ```
 ts-node main.ts 2 0x72dd39014b8c9230498307e9da40872f1644aeef 0.00001187 0.00001189 1 
@@ -65,7 +63,7 @@ ts-node main.ts 2 0x72dd39014b8c9230498307e9da40872f1644aeef 0.00001187 0.000011
 3809.8162 FINK is able to get by swapping WBNB in the top price of 0.00001189 FINK/WBNB
 ```
 
-The result shows that swapable WBNB's amount based on the given price ranges of `FINK/WBNB`.
+Above result shows that swapable `FINK`'s amount based on the given price ranges of `FINK/WBNB`.
 
 This result is calculated based on the current reserves of the pair.
 
