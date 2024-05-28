@@ -1,11 +1,12 @@
 import Web3 from 'web3';
-import dotenv from 'dotenv'
+import BigNumber from 'bignumber.js';
+import dotenv from 'dotenv';
 
 let artifact = require('./artifacts/PancakeCal.json');
 dotenv.config();
 const web3 = new Web3(process.env.BSC_MAINNET_RPC_URL);
 const address = process.env.PAN_CONTRACT_ADDRESS;
-const DENOMINATOR = Math.pow(10, Number(process.env.DENOMINATOR));
+const DENOMINATOR = Math.pow(10, 15);
 const contract = new web3.eth.Contract(artifact.abi, address);
 
 export async function swapableTokenAmountInThePool(pool: string, startPrice: number, endPrice: number, rangeType: number) {
@@ -17,10 +18,15 @@ export async function swapableTokenAmountInThePool(pool: string, startPrice: num
             'decimals': number,
             'symbol0': string,
             'symbol1': string
-        } = await contract.methods.getSwapableTokenAmount(pool, startPrice * DENOMINATOR, endPrice * DENOMINATOR, rangeType).call();
+        } = await contract.methods.getSwapableTokenAmount(pool, BigInt(startPrice * DENOMINATOR), BigInt(endPrice * DENOMINATOR), rangeType).call();
 
-        let amountForStart = (Number(returns.startReserve) - Number(returns.current)) / (10 ** Number(returns.decimals));
-        let endForStart = (Number(returns.endReserve) - Number(returns.current)) / (10 ** Number(returns.decimals));
+        const current = new BigNumber(returns.current);
+        const startReserve = new BigNumber(returns.startReserve);
+        const endReserve = new BigNumber(returns.endReserve);
+        const decimals = new BigNumber(returns.decimals);
+
+        let amountForStart = startReserve.minus(current).div(BigNumber(10).pow(decimals));
+        let endForStart = endReserve.minus(current).div(BigNumber(10).pow(decimals));
 
         let symbol0: string;
         let symbol1: string;
@@ -32,18 +38,18 @@ export async function swapableTokenAmountInThePool(pool: string, startPrice: num
             symbol0 = returns.symbol1;
         }
 
-        if (amountForStart > 0) {
-            console.log(`${amountForStart} ${symbol0} is swapable to get ${symbol1} in the bottom price of ${startPrice} ${symbol0}/${symbol1}`);
+        if (amountForStart.gt(0)) {
+            console.log(`${scientificNotation(amountForStart)} ${symbol0} is swapable to get ${symbol1} in the bottom price of ${startPrice} ${symbol0}/${symbol1}`);
         } else {
-            amountForStart = Math.abs(amountForStart);
-            console.log(`${amountForStart} ${symbol0} is able to get by swapping ${symbol1} in the bottom price of ${startPrice} ${symbol0}/${symbol1}`);
+            amountForStart = amountForStart.abs();
+            console.log(`${scientificNotation(amountForStart)} ${symbol0} is able to get by swapping ${symbol1} in the bottom price of ${startPrice} ${symbol0}/${symbol1}`);
         }
 
-        if (endForStart > 0) {
-            console.log(`${endForStart} ${symbol0} is swapable to get ${symbol1} in the top price of ${endPrice} ${symbol0}/${symbol1}`);
+        if (endForStart.gt(0)) {
+            console.log(`${scientificNotation(endForStart)} ${symbol0} is swapable to get ${symbol1} in the top price of ${endPrice} ${symbol0}/${symbol1}`);
         } else {
-            endForStart = Math.abs(endForStart);
-            console.log(`${endForStart} ${symbol0} is able to get by swapping ${symbol1} in the top price of ${endPrice} ${symbol0}/${symbol1}`);
+            endForStart = endForStart.abs();
+            console.log(`${scientificNotation(endForStart)} ${symbol0} is able to get by swapping ${symbol1} in the top price of ${endPrice} ${symbol0}/${symbol1}`);
         }
     } catch(error) {
         console.error("Error fetching token price:", error);
@@ -59,13 +65,22 @@ export async function tokenPriceInThePool(pool: string) {
             'symbol0': string,
             'symbol1': string
         } = await contract.methods.getPriceFromPoolTokens(pool).call();
-        const price01: number = Number(returns.price01) / DENOMINATOR;
-        const price10: number = Number(returns.price10) / DENOMINATOR;
+
+        const price01 = new BigNumber(returns.price01).div(DENOMINATOR);
+        const price10 = new BigNumber(returns.price10).div(DENOMINATOR);
+
         // output prices
-        console.log(`${returns.symbol0} / ${returns.symbol1}: ${price01}`);
-        console.log(`${returns.symbol1} / ${returns.symbol0}: ${price10}`);
+        console.log(`${returns.symbol0} / ${returns.symbol1}: ${scientificNotation(price01)}`);
+        console.log(`${returns.symbol1} / ${returns.symbol0}: ${scientificNotation(price10)}`);
     } catch(error) {
         console.error(error);
         throw error;
     };
+}
+
+
+function scientificNotation(num: BigNumber): string {
+    if (num.gte(1)) return num.toFixed(4);
+    const exponent = new BigNumber(Number(num.e));
+    return num.toFixed(exponent.abs().plus(3).toNumber());
 }
