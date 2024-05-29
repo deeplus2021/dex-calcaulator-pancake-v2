@@ -15,16 +15,16 @@ The type of commands to use this feature is as follow:
 ts-node main.ts 1 <pair_address>
 ```
 
-For example, to get the prices in `FINK/WBNB` pair of pancakeswap v2, you should type following commands:
+For example, to get the prices in `TRUNK/BUSD` pair of pancakeswap v2, you should type following commands:
 ```
-ts-node main.ts 1 0x72dd39014b8c9230498307e9da40872f1644aeef
+ts-node main.ts 1 0xf15A72B15fC4CAeD6FaDB1ba7347f6CCD1E0Aede
 ```
-`0x72dd39014b8c9230498307e9da40872f1644aeef` is the address of `FINK/WBNB` pair of pancakeswap V2.
+`0xf15A72B15fC4CAeD6FaDB1ba7347f6CCD1E0Aede` is the address of `TRUNK/BUSD` pair of pancakeswap V2.
 
 The result is as follow:
 ```
-WBNB / FINK: 84160.4557
-FINK / WBNB: 0.00001188
+TRUNK/BUSD: 0.4897
+BUSD/TRUNK: 2.0418
 ```
 The result shows that one token's price in another token of the pair based on their reserves.
 
@@ -36,34 +36,29 @@ You can get the swapable token amount based on the particular token price ranges
 
 The type of commands to use this feature is as follow:
 ```
-ts-node main.ts 2 <pair_address> <range_from> <range_to> <0|1>
+ts-node main.ts 2 <pair_address> <range_from> <range_to>
 ```
-The last parameter is for `range type`.
-
-If you are going to put range of prices as `token0/token1` (In above example, `WBNB/FINK`), you should put this parameter as `0`.
-
-On the other hand, if you are going to put range of prices as `token1/token0` (`FINK/WBNB`), you should put this parameter as `1`.
 
 For example, let look at following examples:
 ```
-ts-node main.ts 2 0x72dd39014b8c9230498307e9da40872f1644aeef 84160 84161 0
+ts-node main.ts 2 0xf15A72B15fC4CAeD6FaDB1ba7347f6CCD1E0Aede 0.4894 0.4899
 
-0.0003672 WBNB is swapable to get FINK in the bottom price of 84160 WBNB/FINK
-0.0004386 WBNB is able to get by swapping FINK in the top price of 84161 WBNB/FINK
+3462.5176 TRUNK => 1690.9110 BUSD :to reach the price of 0.4894 TRUNK/BUSD
+776.4675 BUSD => 1581.2418 TRUNK :to reach the price of 0.4899 TRUNK/BUSD
 ```
 
-Above result shows that swapable `WBNB`'s amount based on the given price ranges of `WBNB/FINK`.
+Above result shows that swapable `TRUNK` or `BUSD`'s amounts based on the given price ranges of `TRUNK/BUSD`.
 
-In other words, if you swap `0.0003672 WBNB`, then you will get some `FINK` and the price will be `84160 WBNB/FINK`. And you can get `0.0004386 WBNB` by swapping some `FINK` and the price will be `84161 WBNB/FINK`.
+In other words, if you swap `3462.5176 TRUNK`, then you will get some `1690.9110 BUSD` and the price will be `0.4894 TRUNK/BUSD`. And you can get `1581.2418 TRUNK` by swapping some `776.4675 BUSD` and the price will be `0.4899 TRUNK/BUSD`.
 
 ```
-ts-node main.ts 2 0x72dd39014b8c9230498307e9da40872f1644aeef 0.00001187 0.00001189 1 
+ts-node main.ts 2 0xf15A72B15fC4CAeD6FaDB1ba7347f6CCD1E0Aede 2.0415 2.0421 
 
-5799.9911 FINK is swapable to get WBNB in the bottom price of 0.00001187 FINK/WBNB
-3809.8162 FINK is able to get by swapping WBNB in the top price of 0.00001189 FINK/WBNB
+459.7012 BUSD => 936.2226 TRUNK :to reach the price of 2.0415 BUSD/TRUNK
+513.8729 TRUNK => 251.0233 BUSD :to reach the price of 2.0421 BUSD/TRUNK
 ```
 
-Above result shows that swapable `FINK`'s amount based on the given price ranges of `FINK/WBNB`.
+Above result shows that swapable `BUSD` or `TRUNK`'s amounts based on the given price ranges of `BUSD/TRUNK`.
 
 This result is calculated based on the current reserves of the pair.
 

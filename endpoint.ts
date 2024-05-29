@@ -66,7 +66,7 @@ export async function swapableTokenAmountInThePool(pool: string, startPrice: num
 
             a0 = T.sqrt().minus(BigNumber(1.9975).times(reserve0)).div(BigNumber(1.995));
             a1 = BigNumber(0.9975).times(a0).times(reserve1).div(reserve0.plus(BigNumber(0.9975).times(a0)));
-            console.log(`${scientificNotation(a0.div(BigNumber(10).pow(decimals0)), 4)} ${symbol0} => ${scientificNotation(a1.div(BigNumber(10).pow(decimals1)), 4)} ${symbol1} :to reach the price of ${start} ${symbol0}/${symbol1}`);
+            console.log(`${scientificNotation(a0.div(BigNumber(10).pow(decimals0)), 4)} ${symbol0} => ${scientificNotation(a1.div(BigNumber(10).pow(decimals1)), 4)} ${symbol1} | to reach the price of ${start} ${symbol0}/${symbol1}`);
         } else {
             let T: BigNumber = BigNumber(1.9975).times(reserve1).pow(2).minus(BigNumber(4).times(reserve1.pow(2).minus(K.times(start).div(diffDecimals))));
             if (T.lt(0)) {
@@ -76,7 +76,7 @@ export async function swapableTokenAmountInThePool(pool: string, startPrice: num
 
             a1 = T.sqrt().minus(BigNumber(1.9975).times(reserve1)).div(BigNumber(1.995));
             a0 = BigNumber(0.9975).times(a1).times(reserve0).div(reserve1.plus(BigNumber(0.9975).times(a1)));
-            console.log(`${scientificNotation(a1.div(BigNumber(10).pow(decimals1)), 4)} ${symbol1} => ${scientificNotation(a0.div(BigNumber(10).pow(decimals0)), 4)} ${symbol0} :to reach the price of ${start} ${symbol0}/${symbol1}`);
+            console.log(`${scientificNotation(a1.div(BigNumber(10).pow(decimals1)), 4)} ${symbol1} => ${scientificNotation(a0.div(BigNumber(10).pow(decimals0)), 4)} ${symbol0} | to reach the price of ${start} ${symbol0}/${symbol1}`);
         }
 
         if (currentPrice.gt(end)) {
@@ -90,7 +90,7 @@ export async function swapableTokenAmountInThePool(pool: string, startPrice: num
 
             a0 = T.sqrt().minus(BigNumber(1.9975).times(reserve0)).div(BigNumber(1.995));
             a1 = BigNumber(0.9975).times(a0).times(reserve1).div(reserve0.plus(BigNumber(0.9975).times(a0)));
-            console.log(`${scientificNotation(a0.div(BigNumber(10).pow(decimals0)), 4)} ${symbol0} => ${scientificNotation(a1.div(BigNumber(10).pow(decimals1)), 4)} ${symbol1} :to reach the price of ${end} ${symbol0}/${symbol1}`);
+            console.log(`${scientificNotation(a0.div(BigNumber(10).pow(decimals0)), 4)} ${symbol0} => ${scientificNotation(a1.div(BigNumber(10).pow(decimals1)), 4)} ${symbol1} | to reach the price of ${end} ${symbol0}/${symbol1}`);
         } else {
             let T: BigNumber = BigNumber(1.9975).times(reserve1).pow(2).minus(BigNumber(4).times(reserve1.pow(2).minus(K.times(end).div(diffDecimals))));
             if (T.lt(0)) {
@@ -100,7 +100,7 @@ export async function swapableTokenAmountInThePool(pool: string, startPrice: num
 
             a1 = T.sqrt().minus(BigNumber(1.9975).times(reserve1)).div(BigNumber(1.995));
             a0 = BigNumber(0.9975).times(a1).times(reserve0).div(reserve1.plus(BigNumber(0.9975).times(a1)));
-            console.log(`${scientificNotation(a1.div(BigNumber(10).pow(decimals1)), 4)} ${symbol1}  => ${scientificNotation(a0.div(BigNumber(10).pow(decimals0)), 4)} ${symbol0} :to reach the price of ${end} ${symbol0}/${symbol1}`);
+            console.log(`${scientificNotation(a1.div(BigNumber(10).pow(decimals1)), 4)} ${symbol1} => ${scientificNotation(a0.div(BigNumber(10).pow(decimals0)), 4)} ${symbol0} | to reach the price of ${end} ${symbol0}/${symbol1}`);
         }
     } catch(error) {
         console.error("Error fetching token price:", error);
