@@ -1,6 +1,7 @@
 import {
     tokenPriceInThePool,
-    swapableTokenAmountInThePool
+    swapableTokenAmountInThePool,
+    test
 } from "./endpoint";
 import dotenv from 'dotenv';
 
@@ -36,5 +37,6 @@ if (functionIndicator == '1') {
     const rangeType = Number(process.argv[6]);
     swapableTokenAmount(pool, startPrice, endPrice, rangeType);
 } else {
+    test();
     console.log("There is no matching function indicator");
 }
