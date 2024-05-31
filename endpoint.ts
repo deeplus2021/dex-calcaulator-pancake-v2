@@ -50,57 +50,36 @@ export async function swapableTokenAmountInThePool(pool: string, startPrice: num
             symbol0 = symbol1;
             symbol1 = symbol;
         }
-        const diffDecimals: BigNumber = BigNumber(10).pow(decimals0.minus(decimals1));
+        // D = 10 ^ d0 / 10 ^ d1
+        const D0 = BigNumber(10).pow(decimals0);
+        const D1 = BigNumber(10).pow(decimals1);
+        const D: BigNumber = D0.div(D1);
 
         let a0: BigNumber;
         let a1: BigNumber;
-        const currentPrice: BigNumber = reserve1.times(BigNumber(10).pow(decimals0)).div(reserve0).div(BigNumber(10).pow(decimals1));
+        const currentPrice: BigNumber = reserve1.times(D0).div(reserve0).div(D1);
         if (currentPrice.gt(start)) {
-            // diffDecimals * K / P = (r0 + a0) * (r0 + 0.9975a0)
-            // a0 = -1.9975 * r0 + ((1.9975 * r0) ^ 2 - 4 * (r0 ^ 2 - diffDecimals * K / P)) ^ 0.5
-            let T: BigNumber = BigNumber(1.9975).times(reserve0).pow(2).minus(BigNumber(4).times(reserve0.pow(2).minus(K.times(diffDecimals).div(start))));
-            if (T.lt(0)) {
-                console.log("ERROR!: Calc failed!");
-                return;
-            }
-
-            a0 = T.sqrt().minus(BigNumber(1.9975).times(reserve0)).div(BigNumber(1.995));
-            a1 = BigNumber(0.9975).times(a0).times(reserve1).div(reserve0.plus(BigNumber(0.9975).times(a0)));
-            console.log(`${scientificNotation(a0.div(BigNumber(10).pow(decimals0)), 4)} ${symbol0} => ${scientificNotation(a1.div(BigNumber(10).pow(decimals1)), 4)} ${symbol1} | to reach the price of ${start} ${symbol0}/${symbol1}`);
+            // a0 = r1 * D / P - r0 / 0.9975
+            // a1 = a0 * P / D
+            a0 = reserve1.times(D).div(start).minus(reserve0.div(BigNumber(0.9975)));
+            a1 = a0.times(start).div(D);
+            console.log(`${scientificNotation(a0.div(D0), 4)} ${symbol0} => ${scientificNotation(a1.div(D1), 4)} ${symbol1} | to reach the price of ${start} ${symbol0}/${symbol1}`);
         } else {
-            let T: BigNumber = BigNumber(1.9975).times(reserve1).pow(2).minus(BigNumber(4).times(reserve1.pow(2).minus(K.times(start).div(diffDecimals))));
-            if (T.lt(0)) {
-                console.log("ERROR!: Calc failed!");
-                return;
-            }
-
-            a1 = T.sqrt().minus(BigNumber(1.9975).times(reserve1)).div(BigNumber(1.995));
-            a0 = BigNumber(0.9975).times(a1).times(reserve0).div(reserve1.plus(BigNumber(0.9975).times(a1)));
-            console.log(`${scientificNotation(a1.div(BigNumber(10).pow(decimals1)), 4)} ${symbol1} => ${scientificNotation(a0.div(BigNumber(10).pow(decimals0)), 4)} ${symbol0} | to reach the price of ${start} ${symbol0}/${symbol1}`);
+            a1 = reserve0.times(start).div(D).minus(reserve1.div(BigNumber(0.9975)));
+            a0 = a1.div(start).times(D);
+            console.log(`${scientificNotation(a1.div(D1), 4)} ${symbol1} => ${scientificNotation(a0.div(D0), 4)} ${symbol0} | to reach the price of ${start} ${symbol0}/${symbol1}`);
         }
 
         if (currentPrice.gt(end)) {
-            // diffDecimals * K / P = (r0 + a0) * (r0 + 0.9975a0)
-            // a0 = -1.9975 * r0 + ((1.9975 * r0) ^ 2 - 4 * (r0 ^ 2 - diffDecimals * K / P)) ^ 0.5
-            let T: BigNumber = BigNumber(1.9975).times(reserve0).pow(2).minus(BigNumber(4).times(reserve0.pow(2).minus(K.times(diffDecimals).div(end))));
-            if (T.lt(0)) {
-                console.log("ERROR!: Calc failed!");
-                return;
-            }
-
-            a0 = T.sqrt().minus(BigNumber(1.9975).times(reserve0)).div(BigNumber(1.995));
-            a1 = BigNumber(0.9975).times(a0).times(reserve1).div(reserve0.plus(BigNumber(0.9975).times(a0)));
-            console.log(`${scientificNotation(a0.div(BigNumber(10).pow(decimals0)), 4)} ${symbol0} => ${scientificNotation(a1.div(BigNumber(10).pow(decimals1)), 4)} ${symbol1} | to reach the price of ${end} ${symbol0}/${symbol1}`);
+            // a0 = r1 * D / P - r0 / 0.9975
+            // a1 = a0 * P / D
+            a0 = reserve1.times(D).div(end).minus(reserve0.div(BigNumber(0.9975)));
+            a1 = a0.times(end).div(D);
+            console.log(`${scientificNotation(a0.div(D0), 4)} ${symbol0} => ${scientificNotation(a1.div(D1), 4)} ${symbol1} | to reach the price of ${end} ${symbol0}/${symbol1}`);
         } else {
-            let T: BigNumber = BigNumber(1.9975).times(reserve1).pow(2).minus(BigNumber(4).times(reserve1.pow(2).minus(K.times(end).div(diffDecimals))));
-            if (T.lt(0)) {
-                console.log("ERROR!: Calc failed!");
-                return;
-            }
-
-            a1 = T.sqrt().minus(BigNumber(1.9975).times(reserve1)).div(BigNumber(1.995));
-            a0 = BigNumber(0.9975).times(a1).times(reserve0).div(reserve1.plus(BigNumber(0.9975).times(a1)));
-            console.log(`${scientificNotation(a1.div(BigNumber(10).pow(decimals1)), 4)} ${symbol1} => ${scientificNotation(a0.div(BigNumber(10).pow(decimals0)), 4)} ${symbol0} | to reach the price of ${end} ${symbol0}/${symbol1}`);
+            a1 = reserve0.times(end).div(D).minus(reserve1.div(BigNumber(0.9975)));
+            a0 = a1.div(end).times(D);
+            console.log(`${scientificNotation(a1.div(D1), 4)} ${symbol1} => ${scientificNotation(a0.div(D0), 4)} ${symbol0} | to reach the price of ${end} ${symbol0}/${symbol1}`);
         }
     } catch(error) {
         console.error("Error fetching token price:", error);
@@ -125,9 +104,11 @@ export async function tokenPriceInThePool(pool: string) {
         const decimals1: BigNumber = new BigNumber(returns.decimals1);
         const symbol0: string = String(returns.symbol0);
         const symbol1: string = String(returns.symbol1);
+        const D0 = BigNumber(10).pow(decimals0);
+        const D1 = BigNumber(10).pow(decimals1);
 
-        const price01: BigNumber = reserve1.times(BigNumber(10).pow(decimals0)).div(reserve0).div(BigNumber(10).pow(decimals1));
-        const price10: BigNumber = reserve0.times(BigNumber(10).pow(decimals1)).div(reserve1).div(BigNumber(10).pow(decimals0));
+        const price01: BigNumber = reserve1.times(D0).div(reserve0).div(D1);
+        const price10: BigNumber = reserve0.times(D1).div(reserve1).div(D0);
 
         // output prices
         console.log(`${symbol0}/${symbol1}: ${scientificNotation(price01, 4)}`);
