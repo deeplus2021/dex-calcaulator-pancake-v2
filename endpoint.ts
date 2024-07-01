@@ -66,7 +66,7 @@ export async function swapableTokenAmountInThePool(pool: string, startPrice: num
             a0 = reserve1.times(D).div(start).minus(reserve0.div(BigNumber(0.9975)));
             if (a0.gt(0)) {
                 a1 = a0.times(start).div(D).times(0.9999);
-                console.log(`${convert(a0.div(D0), 4)} ${symbol0} => ${convert(a1.div(D1), 4)} ${symbol1} | at the price of ${start} ${symbol0}/${symbol1}`);
+                console.log(`we can get ${convert(a1.div(D1), 4)} ${symbol1} by spending ${convert(a0.div(D0), 4)} ${symbol0} | at the price of ${start} ${symbol0}/${symbol1}`);
             } else {
                 console.log(`NO SWAP: To swap, price should be under ${convert(BigNumber(0.9975).times(currentPrice), 4, 0)} | be over ${convert(currentPrice.div(BigNumber(0.9975)), 4)}`);
             }
@@ -74,7 +74,7 @@ export async function swapableTokenAmountInThePool(pool: string, startPrice: num
             a1 = reserve0.times(start).div(D).minus(reserve1.div(BigNumber(0.9975)));
             if (a1.gt(0)) {
                 a0 = a1.div(start).times(D).times(0.9999);
-                console.log(`${convert(a1.div(D1), 4)} ${symbol1} => ${convert(a0.div(D0), 4)} ${symbol0} | at the price of ${start} ${symbol0}/${symbol1}`);
+                console.log(`we can get ${convert(a0.div(D0), 4)} ${symbol0} by spending ${convert(a1.div(D1), 4)} ${symbol1} | at the price of ${start} ${symbol0}/${symbol1}`);
             } else {
                 console.log(`NO SWAP: To swap, price should be under ${convert(BigNumber(0.9975).times(currentPrice), 4, 0)} | be over ${convert(currentPrice.div(BigNumber(0.9975)), 4)}`);
             }
@@ -86,7 +86,7 @@ export async function swapableTokenAmountInThePool(pool: string, startPrice: num
             a0 = reserve1.times(D).div(end).minus(reserve0.div(BigNumber(0.9975)));
             if (a0.gt(0)) {
                 a1 = a0.times(end).div(D).times(0.9999);
-                console.log(`${convert(a0.div(D0), 4)} ${symbol0} => ${convert(a1.div(D1), 4)} ${symbol1} | at the price of ${end} ${symbol0}/${symbol1}`);
+                console.log(`we can get ${convert(a1.div(D1), 4)} ${symbol1} by spending ${convert(a0.div(D0), 4)} ${symbol0} | at the price of ${end} ${symbol0}/${symbol1}`);
             } else {
                 console.log(`NO SWAP: To swap, price should be under ${convert(BigNumber(0.9975).times(currentPrice), 4, 0)} | be over ${convert(currentPrice.div(BigNumber(0.9975)), 4)}`);
             }
@@ -94,7 +94,7 @@ export async function swapableTokenAmountInThePool(pool: string, startPrice: num
             a1 = reserve0.times(end).div(D).minus(reserve1.div(BigNumber(0.9975)));
             if (a1.gt(0)) {
                 a0 = a1.div(end).times(D).times(0.9999);
-                console.log(`${convert(a1.div(D1), 4)} ${symbol1} => ${convert(a0.div(D0), 4)} ${symbol0} | at the price of ${end} ${symbol0}/${symbol1}`);
+                console.log(`we can get ${convert(a0.div(D0), 4)} ${symbol0} by spending ${convert(a1.div(D1), 4)} ${symbol1} | at the price of ${end} ${symbol0}/${symbol1}`);
             } else {
                 console.log(`NO SWAP: To swap, price should be under ${convert(BigNumber(0.9975).times(currentPrice), 4, 0)} | be over ${convert(currentPrice.div(BigNumber(0.9975)), 4)}`);
             }
