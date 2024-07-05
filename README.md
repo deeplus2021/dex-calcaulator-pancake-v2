@@ -62,3 +62,20 @@ Above result shows that swapable `BUSD` or `TRUNK`'s amounts based on the given 
 
 This result is calculated based on the current reserves of the pair.
 
+### Get the expected input amount for exactOutputSwap
+
+You can get the expected input amount for exactOutputSwap based on specified output amount.
+The type of commands to use this feature is as follow:
+```
+ts-node main.ts 3 <pair_address> <output_amount> <zero_for_one>
+```
+`pair_address` is the pancake v2 pool address. And `output_amount` is specified amount of output token on the pool. And `zero_for_one` address is direction of swap. In other words, if `zero_for_one` is 1, direction of swap is `token0 => token1`, and if `zero_for_one` is 0, otherwise.
+
+For example, let's look at following examples:
+```
+ts-node main.ts 3 0x16b9a82891338f9bA80E2D6970FddA79D1eb0daE 5000 0
+
+10.0948 WBNB
+```
+Here, `0x16b9a82891338f9bA80E2D6970FddA79D1eb0daE` is the pancakeswap v2 pair of `USDT/WBNB`. And `5000` is the amount of output token in swap. `0` is direction of swapping. In other words, this command will return input amount of `WBNB` to get the `5000 USDT` in v2 pair.
+

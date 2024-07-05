@@ -1,6 +1,7 @@
 import {
     tokenPriceInThePool,
     swapableTokenAmountInThePool,
+    exactOutputSwapInputAmount,
     test
 } from "./endpoint";
 import dotenv from 'dotenv';
@@ -35,6 +36,11 @@ if (functionIndicator == '1') {
     const startPrice = Number(process.argv[4]);
     const endPrice = Number(process.argv[5]);
     swapableTokenAmount(pool, startPrice, endPrice);
+} else if (functionIndicator == '3') {
+    const pool = process.argv[3];
+    const output = Number(process.argv[4]);
+    const zeroForOne = Number(process.argv[5]);
+    exactOutputSwapInputAmount(pool, output, zeroForOne);
 } else {
     test();
     console.log("There is no matching function indicator");

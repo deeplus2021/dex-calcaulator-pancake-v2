@@ -1,12 +1,18 @@
 import Web3 from 'web3';
 import BigNumber from 'bignumber.js';
 import dotenv from 'dotenv';
+import { formatUnits, parseUnits } from 'ethers';
 
 let artifact = require('./artifacts/PancakeCal.json');
+let poolArtifact = require('./artifacts/IUniswapV2Pair.json');
+let routerArtifact = require('./artifacts/IUniswapV2Router02.json');
+const erc20Artifact = require('./artifacts/ERC20.json');
 dotenv.config();
 const web3 = new Web3(process.env.BSC_MAINNET_RPC_URL);
 const address = process.env.PAN_CONTRACT_ADDRESS;
+const routerAddress = process.env.PAN_ROUTER_ADDRESS;
 const contract = new web3.eth.Contract(artifact.abi, address);
+const routerContract = new web3.eth.Contract(routerArtifact.abi, routerAddress)
 
 // BigNumber.config({ ROUNDING_MODE: BigNumber.ROUND_DOWN })
 
@@ -131,6 +137,53 @@ export async function tokenPriceInThePool(pool: string) {
         // output prices
         console.log(`${symbol0}/${symbol1}: ${convert(price01, 4)}`);
         console.log(`${symbol1}/${symbol0}: ${convert(price10, 4)}`);
+    } catch(error) {
+        console.error(error);
+        throw error;
+    };
+}
+
+export async function exactOutputSwapInputAmount(
+    pool: string,
+    output: number,
+    zeroForOne: number
+) {
+    const poolContract = new web3.eth.Contract(poolArtifact.abi, pool);
+    try {
+        const token0 = await poolContract.methods.token0().call();
+        const token1 = await poolContract.methods.token1().call();
+        const reserves: {
+            'reserve0': number,
+            'reserve1': number,
+            'blockTimestampLast': number
+        } = await poolContract.methods.getReserves().call();
+        const token0Contract = new web3.eth.Contract(erc20Artifact.abi, String(token0));
+        const token1Contract = new web3.eth.Contract(erc20Artifact.abi, String(token1));
+        const decimals0 = await token0Contract.methods.decimals().call();
+        const decimals1 = await token1Contract.methods.decimals().call();
+        const symbol0 = await token0Contract.methods.symbol().call();
+        const symbol1 = await token1Contract.methods.symbol().call();
+
+        let path, amountOut, reserveIn, reserveOut, symbolIn, symbolOut, decimalsIn;
+        if (zeroForOne == 1) {
+            path = [token0, token1];
+            amountOut = BigNumber(output).times(BigNumber(10).pow(Number(decimals1)));
+            reserveIn = reserves.reserve0;
+            reserveOut = reserves.reserve1;
+            symbolIn = symbol0;
+            symbolOut = symbol1;
+            decimalsIn = decimals0;
+        } else {
+            path = [token1, token0];
+            amountOut = BigNumber(output).times(BigNumber(10).pow(Number(decimals0)));
+            reserveIn = reserves.reserve1;
+            reserveOut = reserves.reserve0;
+            symbolIn = symbol1;
+            symbolOut = symbol0;
+            decimalsIn = decimals1;
+        }
+        const amountIn = await routerContract.methods.getAmountIn(Number(amountOut), reserveIn, reserveOut).call();
+        console.log(convert(BigNumber(String(amountIn)).div(BigNumber(10).pow(Number(decimalsIn))), 4) + ' ' + symbolIn);
     } catch(error) {
         console.error(error);
         throw error;
