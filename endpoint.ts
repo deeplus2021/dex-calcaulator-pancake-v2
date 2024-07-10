@@ -12,7 +12,7 @@ const web3 = new Web3(process.env.BSC_MAINNET_RPC_URL);
 const address = process.env.PAN_CONTRACT_ADDRESS;
 const routerAddress = process.env.PAN_ROUTER_ADDRESS;
 const contract = new web3.eth.Contract(artifact.abi, address);
-const routerContract = new web3.eth.Contract(routerArtifact.abi, routerAddress)
+const routerContract = new web3.eth.Contract(routerArtifact.abi, routerAddress);
 
 // BigNumber.config({ ROUNDING_MODE: BigNumber.ROUND_DOWN })
 
@@ -164,9 +164,8 @@ export async function exactOutputSwapInputAmount(
         const symbol0 = await token0Contract.methods.symbol().call();
         const symbol1 = await token1Contract.methods.symbol().call();
 
-        let path, amountOut, reserveIn, reserveOut, symbolIn, symbolOut, decimalsIn;
+        let amountOut, reserveIn, reserveOut, symbolIn, symbolOut, decimalsIn;
         if (zeroForOne == 1) {
-            path = [token0, token1];
             amountOut = BigNumber(output).times(BigNumber(10).pow(Number(decimals1)));
             reserveIn = reserves.reserve0;
             reserveOut = reserves.reserve1;
@@ -174,7 +173,6 @@ export async function exactOutputSwapInputAmount(
             symbolOut = symbol1;
             decimalsIn = decimals0;
         } else {
-            path = [token1, token0];
             amountOut = BigNumber(output).times(BigNumber(10).pow(Number(decimals0)));
             reserveIn = reserves.reserve1;
             reserveOut = reserves.reserve0;
