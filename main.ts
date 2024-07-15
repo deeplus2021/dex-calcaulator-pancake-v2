@@ -4,6 +4,7 @@ import {
     exactOutputSwapInputAmount,
     test
 } from "./endpoint";
+import BigNumber from 'bignumber.js';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -16,9 +17,9 @@ async function tokenPrice(pool: string) {
     }
 }
 
-async function swapableTokenAmount(pool: string, priceFrom: number, priceTo: number) {
+async function swapableTokenAmount(pool: string, price: BigNumber) {
     try {
-        await swapableTokenAmountInThePool(pool, priceFrom, priceTo);
+        await swapableTokenAmountInThePool(pool, price);
     } catch (error) {
         console.error("Error fetching token price:", error);
     }
@@ -33,9 +34,8 @@ if (functionIndicator == '1') {
 } else if (functionIndicator == '2') {
     // get the swapable token amount in the pool
     const pool = process.argv[3];
-    const startPrice = Number(process.argv[4]);
-    const endPrice = Number(process.argv[5]);
-    swapableTokenAmount(pool, startPrice, endPrice);
+    const price = Number(process.argv[4]);
+    swapableTokenAmount(pool, BigNumber(price));
 } else if (functionIndicator == '3') {
     const pool = process.argv[3];
     const output = Number(process.argv[4]);

@@ -16,7 +16,7 @@ const routerContract = new web3.eth.Contract(routerArtifact.abi, routerAddress);
 
 // BigNumber.config({ ROUNDING_MODE: BigNumber.ROUND_DOWN })
 
-export async function swapableTokenAmountInThePool(pool: string, startPrice: number, endPrice: number) {
+export async function swapableTokenAmountInThePool(pool: string, price: BigNumber) {
     let rangeType: number = 0;
     try {
         const returns: {
@@ -28,8 +28,6 @@ export async function swapableTokenAmountInThePool(pool: string, startPrice: num
             'symbol1': string
         } = await contract.methods.getPoolInfo(pool).call();
 
-        let start = BigNumber(startPrice);
-        let end = BigNumber(endPrice);
         let reserve0: BigNumber = new BigNumber(returns.reserve0);
         let reserve1: BigNumber = new BigNumber(returns.reserve1);
         let decimals0: BigNumber = new BigNumber(returns.decimals0);
@@ -40,7 +38,7 @@ export async function swapableTokenAmountInThePool(pool: string, startPrice: num
         const price01: BigNumber = reserve1.times(BigNumber(10).pow(decimals0)).div(reserve0).div(BigNumber(10).pow(decimals1));
         const price10: BigNumber = reserve0.times(BigNumber(10).pow(decimals1)).div(reserve1).div(BigNumber(10).pow(decimals0));
 
-        if (price01.minus(startPrice).abs().gt(price10.minus(startPrice).abs()))
+        if (price01.minus(price).abs().gt(price10.minus(price).abs()))
             rangeType = 1;
         
         let middle: BigNumber;
@@ -66,41 +64,21 @@ export async function swapableTokenAmountInThePool(pool: string, startPrice: num
         let a0: BigNumber;
         let a1: BigNumber;
         const currentPrice: BigNumber = reserve1.times(D0).div(reserve0).div(D1);
-        if (currentPrice.gt(start)) {
+        if (currentPrice.gt(price)) {
             // a0 = r1 * D / P - r0 / 0.9975
             // a1 = a0 * P / D
-            a0 = reserve1.times(D).div(start).minus(reserve0.div(BigNumber(0.9975)));
+            a0 = reserve1.times(D).div(price).minus(reserve0.div(BigNumber(0.9975)));
             if (a0.gt(0)) {
-                a1 = a0.times(start).div(D).times(0.9999);
-                console.log(`we can get ${convert(a1.div(D1), 4)} ${symbol1} by spending ${convert(a0.div(D0), 4)} ${symbol0} | at the price of ${start} ${symbol0}/${symbol1}`);
+                a1 = a0.times(price).div(D).times(0.9999);
+                console.log(`You can buy ${convert(a1.div(D1), 4)} ${symbol1} by spending ${convert(a0.div(D0), 4)} ${symbol0}`);
             } else {
                 console.log(`NO SWAP: To swap, price should be under ${convert(BigNumber(0.9975).times(currentPrice), 4, 0)} | be over ${convert(currentPrice.div(BigNumber(0.9975)), 4)}`);
             }
         } else {
-            a1 = reserve0.times(start).div(D).minus(reserve1.div(BigNumber(0.9975)));
+            a1 = reserve0.times(price).div(D).minus(reserve1.div(BigNumber(0.9975)));
             if (a1.gt(0)) {
-                a0 = a1.div(start).times(D).times(0.9999);
-                console.log(`we can get ${convert(a0.div(D0), 4)} ${symbol0} by spending ${convert(a1.div(D1), 4)} ${symbol1} | at the price of ${start} ${symbol0}/${symbol1}`);
-            } else {
-                console.log(`NO SWAP: To swap, price should be under ${convert(BigNumber(0.9975).times(currentPrice), 4, 0)} | be over ${convert(currentPrice.div(BigNumber(0.9975)), 4)}`);
-            }
-        }
-
-        if (currentPrice.gt(end)) {
-            // a0 = r1 * D / P - r0 / 0.9975
-            // a1 = a0 * P / D
-            a0 = reserve1.times(D).div(end).minus(reserve0.div(BigNumber(0.9975)));
-            if (a0.gt(0)) {
-                a1 = a0.times(end).div(D).times(0.9999);
-                console.log(`we can get ${convert(a1.div(D1), 4)} ${symbol1} by spending ${convert(a0.div(D0), 4)} ${symbol0} | at the price of ${end} ${symbol0}/${symbol1}`);
-            } else {
-                console.log(`NO SWAP: To swap, price should be under ${convert(BigNumber(0.9975).times(currentPrice), 4, 0)} | be over ${convert(currentPrice.div(BigNumber(0.9975)), 4)}`);
-            }
-        } else {
-            a1 = reserve0.times(end).div(D).minus(reserve1.div(BigNumber(0.9975)));
-            if (a1.gt(0)) {
-                a0 = a1.div(end).times(D).times(0.9999);
-                console.log(`we can get ${convert(a0.div(D0), 4)} ${symbol0} by spending ${convert(a1.div(D1), 4)} ${symbol1} | at the price of ${end} ${symbol0}/${symbol1}`);
+                a0 = a1.div(price).times(D).times(0.9999);
+                console.log(`You can buy ${convert(a0.div(D0), 4)} ${symbol0} by spending ${convert(a1.div(D1), 4)} ${symbol1}`);
             } else {
                 console.log(`NO SWAP: To swap, price should be under ${convert(BigNumber(0.9975).times(currentPrice), 4, 0)} | be over ${convert(currentPrice.div(BigNumber(0.9975)), 4)}`);
             }
@@ -135,8 +113,8 @@ export async function tokenPriceInThePool(pool: string) {
         const price10: BigNumber = reserve0.times(D1).div(reserve1).div(D0);
 
         // output prices
-        console.log(`${symbol0}/${symbol1}: ${convert(price01, 4)}`);
-        console.log(`${symbol1}/${symbol0}: ${convert(price10, 4)}`);
+        console.log(`1 ${symbol0} = ${convert(price01, 4)} ${symbol1}`);
+        console.log(`1 ${symbol1} = ${convert(price10, 4)} ${symbol0}`);
     } catch(error) {
         console.error(error);
         throw error;
